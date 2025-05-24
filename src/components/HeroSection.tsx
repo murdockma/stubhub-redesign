@@ -383,13 +383,13 @@ const HeroSection = () => {
                         <div className="space-y-3">
                           <p className="text-white/60 text-lg">
                             <span className="text-white/70 font-bold">Date:</span>{' '}
-                            <span className="inline-block border-b-2 border-primary-500 pb-0.5">
+                            <span className="inline-block border-b-2 border-primary-400 pb-0.5">
                               {trendingEvents[currentEventIndex].date}
                             </span>
                           </p>
                           <p className="text-white/60 text-lg">
                             <span className="text-white/70 font-bold">Venue:</span>{' '}
-                            <span className="inline-block border-b-2 border-primary-500 pb-0.5">
+                            <span className="inline-block border-b-2 border-primary-400 pb-0.5">
                               {trendingEvents[currentEventIndex].venue}
                             </span>
                           </p>
@@ -401,7 +401,7 @@ const HeroSection = () => {
                         whileTap={{ scale: 0.98 }}
                         className="mt-6 w-full py-4 px-6 rounded-lg bg-gradient-primary text-white font-medium text-lg hover:shadow-lg hover:shadow-primary-500/20 transition-all duration-300"
                       >
-                        See Tickets
+                        View Tickets
                       </motion.button>
                     </div>
                   </div>

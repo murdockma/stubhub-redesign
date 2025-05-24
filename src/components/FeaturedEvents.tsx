@@ -1,11 +1,45 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CalendarIcon, MapPinIcon, HeartIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, MapPinIcon, HeartIcon, TicketIcon } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
+import TicketPurchaseModal from './TicketPurchaseModal'
+import ViewTicketsModal from './ViewTicketsModal'
 
-const events = [
+interface Event {
+  id: number
+  title: string
+  date: string
+  venue: string
+  image: string
+  price: string
+  description: string
+}
+
+interface PPVEvent {
+  id: number
+  title: string
+  date: string
+  image: string
+  price: string
+  description: string
+}
+
+interface Highlight {
+  id: number
+  title: string
+  date: string
+  image: string
+  description: string
+  stats: {
+    views: number
+    likes: number
+    comments: number
+  }
+}
+
+const events: Event[] = [
   {
     id: 1,
     title: 'Taylor Swift - The Eras Tour',
@@ -13,7 +47,7 @@ const events = [
     venue: 'Madison Square Garden',
     image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80',
     price: 'From $299',
-    category: 'Concerts',
+    description: 'Concerts',
   },
   {
     id: 2,
@@ -22,7 +56,7 @@ const events = [
     venue: 'Crypto.com Arena',
     image: 'https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?auto=format&fit=crop&w=1200&q=80',
     price: 'From $499',
-    category: 'Sports',
+    description: 'Sports',
   },
   {
     id: 3,
@@ -31,12 +65,11 @@ const events = [
     venue: 'Richard Rodgers Theatre',
     image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
     price: 'From $199',
-    category: 'Theater',
+    description: 'Theater',
   },
 ]
 
-// Add PPV Buys and Event Highlights data
-const ppvEvents = [
+const ppvEvents: PPVEvent[] = [
   {
     id: 1,
     title: 'UFC 300: Jones vs. Miocic',
@@ -63,8 +96,7 @@ const ppvEvents = [
   },
 ]
 
-// Add stats to highlights data
-const highlights = [
+const highlights: Highlight[] = [
   {
     id: 1,
     title: 'NBA Finals Game 7 Highlights',
@@ -72,9 +104,9 @@ const highlights = [
     image: 'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=800&q=80',
     description: 'Watch the best moments from the thrilling Game 7!',
     stats: {
-      score: '112-108',
-      attendance: '18,000',
-      mvp: 'Jayson Tatum',
+      views: 100000,
+      likes: 5000,
+      comments: 1000,
     },
   },
   {
@@ -84,9 +116,9 @@ const highlights = [
     image: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80',
     description: "Relive the magic of Hamilton's opening night.",
     stats: {
-      soldOut: 'Yes',
-      standingOvation: '3 Times',
-      lead: 'Lin-Manuel Miranda',
+      views: 50000,
+      likes: 2000,
+      comments: 500,
     },
   },
   {
@@ -96,9 +128,9 @@ const highlights = [
     image: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80',
     description: "Highlights from Taylor Swift's record-breaking tour.",
     stats: {
-      songs: '44',
-      crowd: '70,000+',
-      city: 'Los Angeles',
+      views: 75000,
+      likes: 3000,
+      comments: 750,
     },
   },
 ]
@@ -107,6 +139,10 @@ const FeaturedEvents = () => {
   const [favorites, setFavorites] = useState<number[]>([])
   const [hoveredEvent, setHoveredEvent] = useState<number | null>(null)
   const [currentHighlightIndex, setCurrentHighlightIndex] = useState(0)
+  const [selectedEvent, setSelectedEvent] = useState<Event | PPVEvent | null>(null)
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
+  const [isViewTicketsModalOpen, setIsViewTicketsModalOpen] = useState(false)
+  const [isPPVPurchase, setIsPPVPurchase] = useState(false)
 
   const toggleFavorite = (eventId: number) => {
     setFavorites(prev =>
@@ -119,8 +155,20 @@ const FeaturedEvents = () => {
   const nextHighlight = () => {
     setCurrentHighlightIndex((prev) => (prev + 1) % highlights.length)
   }
+
   const prevHighlight = () => {
     setCurrentHighlightIndex((prev) => (prev - 1 + highlights.length) % highlights.length)
+  }
+
+  const handleViewTickets = (event: Event) => {
+    setSelectedEvent(event)
+    setIsViewTicketsModalOpen(true)
+  }
+
+  const handleBuyPPV = (event: PPVEvent) => {
+    setSelectedEvent(event)
+    setIsPPVPurchase(true)
+    setIsPurchaseModalOpen(true)
   }
 
   const currentHighlight = highlights[currentHighlightIndex]
@@ -139,12 +187,12 @@ const FeaturedEvents = () => {
         </motion.div>
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {events.map((event, index) => (
+          {events.map((event) => (
             <motion.div
               key={event.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: event.id * 0.1 }}
               whileHover={{ y: -5 }}
               onHoverStart={() => setHoveredEvent(event.id)}
               onHoverEnd={() => setHoveredEvent(null)}
@@ -177,7 +225,7 @@ const FeaturedEvents = () => {
                       exit={{ opacity: 0 }}
                       className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white/90 to-transparent"
                     >
-                      <span className="text-sm font-medium text-primary-500">{event.category}</span>
+                      <span className="text-sm font-medium text-primary-500">{event.description}</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -200,6 +248,7 @@ const FeaturedEvents = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow"
+                    onClick={() => handleViewTickets(event)}
                   >
                     View Tickets
                   </motion.button>
@@ -244,6 +293,7 @@ const FeaturedEvents = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     className="ml-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow"
+                    onClick={() => handleBuyPPV(event)}
                   >
                     Buy Now
                   </motion.button>
@@ -274,6 +324,7 @@ const FeaturedEvents = () => {
               className="bg-white border border-gray-200 rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row w-full"
             >
               {/* Video Player */}
+              {/* TODO: Fix hydration error resulting from dynamic rendering of the video frames */}
               <div className="relative w-full md:w-2/5 h-64 md:h-[28rem] group flex-shrink-0 flex items-center justify-center bg-black">
                 <video
                   src="https://www.w3schools.com/html/mov_bbb.mp4"
@@ -331,6 +382,43 @@ const FeaturedEvents = () => {
           </div>
         </div>
       </div>
+
+      {/* Add the ViewTicketsModal */}
+      {selectedEvent && !isPPVPurchase && (
+        <ViewTicketsModal
+          isOpen={isViewTicketsModalOpen}
+          onClose={() => {
+            setIsViewTicketsModalOpen(false)
+            setSelectedEvent(null)
+          }}
+          event={{
+            title: selectedEvent.title,
+            date: selectedEvent.date,
+            venue: 'venue' in selectedEvent ? selectedEvent.venue : 'Online Event',
+            price: selectedEvent.price,
+            image: selectedEvent.image
+          }}
+        />
+      )}
+
+      {/* Keep the TicketPurchaseModal for PPV events */}
+      {selectedEvent && isPPVPurchase && (
+        <TicketPurchaseModal
+          isOpen={isPurchaseModalOpen}
+          onClose={() => {
+            setIsPurchaseModalOpen(false)
+            setSelectedEvent(null)
+          }}
+          event={{
+            title: selectedEvent.title,
+            date: selectedEvent.date,
+            venue: 'venue' in selectedEvent ? selectedEvent.venue : 'Online Event',
+            price: selectedEvent.price,
+            image: selectedEvent.image
+          }}
+          isPPV={isPPVPurchase}
+        />
+      )}
     </section>
   )
 }
