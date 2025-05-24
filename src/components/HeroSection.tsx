@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlassIcon, XMarkIcon, TicketIcon, BanknotesIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, BuildingLibraryIcon, MapPinIcon } from '@heroicons/react/24/outline'
 import { motion, useScroll, useTransform, useInView, AnimatePresence, Transition } from 'framer-motion'
 
 const HeroSection = () => {
@@ -11,6 +11,8 @@ const HeroSection = () => {
   const [currentEventIndex, setCurrentEventIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null)
+  const [hoveredStatIdx, setHoveredStatIdx] = useState<number | null>(null)
+  const [isClient, setIsClient] = useState(false)
   
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
@@ -140,6 +142,10 @@ const HeroSection = () => {
     }
   }, [isModalOpen, trendingEvents.length])
 
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
   const categories = [
     { name: 'Concerts', icon: '🎵' },
     { name: 'Sports', icon: '⚽' },
@@ -194,63 +200,67 @@ const HeroSection = () => {
       className="relative min-h-screen overflow-hidden bg-[url('/sh-background.png')] bg-cover bg-center bg-no-repeat bg-fixed"
     >
       {/* Animated particles */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        {particlePositions.map((pos, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full"
-            style={{ background: 'rgba(99,102,241,0.18)' }}
-            initial={{ x: pos.x, y: pos.y }}
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0.3, 0.6, 0.3],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: pos.duration,
-              repeat: Infinity,
-              delay: pos.delay,
-            }}
-          />
-        ))}
-      </div>
+      {isClient && (
+        <div className="absolute inset-0 pointer-events-none z-0">
+          {particlePositions.map((pos, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 rounded-full"
+              style={{ background: 'rgba(99,102,241,0.18)' }}
+              initial={{ x: pos.x, y: pos.y }}
+              animate={{
+                y: [0, -20, 0],
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: pos.duration,
+                repeat: Infinity,
+                delay: pos.delay,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Floating stars and tickets */}
-      <div className="pointer-events-none absolute inset-0 z-10">
-        {floatingElements.map((el, i) => (
-          <motion.div
-            key={i}
-            className="absolute"
-            style={{ left: el.left, top: el.top }}
-            initial={{ opacity: 0.5, scale: 0.8, y: 0 }}
-            animate={{
-              opacity: [0.5, 1, 0.5],
-              scale: [0.8, 1.1, 0.8],
-              y: [0, -30, 0],
-            }}
-            transition={{
-              duration: el.duration,
-              repeat: Infinity,
-              repeatType: 'reverse',
-              delay: el.delay,
-            }}
-          >
-            {el.isStar ? (
-              // Star SVG
-              <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="opacity-60">
-                <polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9" fill="#fff" fillOpacity="0.3" />
-              </svg>
-            ) : (
-              // Ticket SVG
-              <svg width="32" height="20" fill="none" viewBox="0 0 32 20" className="opacity-40">
-                <rect x="2" y="4" width="28" height="12" rx="3" fill="#fff" fillOpacity="0.15" stroke="#fff" strokeDasharray="4 2" />
-                <circle cx="6" cy="10" r="1.5" fill="#fff" fillOpacity="0.25" />
-                <circle cx="26" cy="10" r="1.5" fill="#fff" fillOpacity="0.25" />
-              </svg>
-            )}
-          </motion.div>
-        ))}
-      </div>
+      {isClient && (
+        <div className="pointer-events-none absolute inset-0 z-10">
+          {floatingElements.map((el, i) => (
+            <motion.div
+              key={i}
+              className="absolute"
+              style={{ left: el.left, top: el.top }}
+              initial={{ opacity: 0.5, scale: 0.8, y: 0 }}
+              animate={{
+                opacity: [0.5, 1, 0.5],
+                scale: [0.8, 1.1, 0.8],
+                y: [0, -30, 0],
+              }}
+              transition={{
+                duration: el.duration,
+                repeat: Infinity,
+                repeatType: 'reverse',
+                delay: el.delay,
+              }}
+            >
+              {el.isStar ? (
+                // Star SVG
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24" className="opacity-60">
+                  <polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9" fill="#fff" fillOpacity="0.3" />
+                </svg>
+              ) : (
+                // Ticket SVG
+                <svg width="32" height="20" fill="none" viewBox="0 0 32 20" className="opacity-40">
+                  <rect x="2" y="4" width="28" height="12" rx="3" fill="#fff" fillOpacity="0.15" stroke="#fff" strokeDasharray="4 2" />
+                  <circle cx="6" cy="10" r="1.5" fill="#fff" fillOpacity="0.25" />
+                  <circle cx="26" cy="10" r="1.5" fill="#fff" fillOpacity="0.25" />
+                </svg>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <motion.div
@@ -432,7 +442,7 @@ const HeroSection = () => {
                 onClick={e => e.stopPropagation()}
               >
                 <button
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={e => { e.stopPropagation(); setIsModalOpen(false); }}
                   className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
                 >
                   <XMarkIcon className="w-6 h-6" />
@@ -444,26 +454,61 @@ const HeroSection = () => {
                       {trendingEvents[currentEventIndex].title} Ticket Stats
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      <div className="bg-dark-300 rounded-lg p-4 text-center">
-                        <div className="text-gray-400 text-xs">Avg Price</div>
-                        <div className="text-primary-400 text-xl font-bold">{eventStats.avgPrice}</div>
-                      </div>
-                      <div className="bg-dark-300 rounded-lg p-4 text-center">
-                        <div className="text-gray-400 text-xs">High</div>
-                        <div className="text-primary-400 text-xl font-bold">{eventStats.highPrice}</div>
-                      </div>
-                      <div className="bg-dark-300 rounded-lg p-4 text-center">
-                        <div className="text-gray-400 text-xs">Low</div>
-                        <div className="text-primary-400 text-xl font-bold">{eventStats.lowPrice}</div>
-                      </div>
-                      <div className="bg-dark-300 rounded-lg p-4 text-center">
-                        <div className="text-gray-400 text-xs">Capacity</div>
-                        <div className="text-primary-400 text-xl font-bold">{eventStats.capacity}</div>
-                      </div>
-                      <div className="bg-dark-300 rounded-lg p-4 text-center">
-                        <div className="text-gray-400 text-xs">Tickets Left</div>
-                        <div className="text-primary-400 text-xl font-bold">{eventStats.ticketsLeft}</div>
-                      </div>
+                      {[
+                        { label: 'Avg Price', value: eventStats.avgPrice, icon: BanknotesIcon },
+                        { label: 'High', value: eventStats.highPrice, icon: ArrowTrendingUpIcon },
+                        { label: 'Low', value: eventStats.lowPrice, icon: ArrowTrendingDownIcon },
+                        { label: 'Capacity', value: eventStats.capacity, icon: BuildingLibraryIcon },
+                        { label: 'Tickets Left', value: eventStats.ticketsLeft, icon: TicketIcon },
+                        { label: 'Best Section', value: '112', icon: MapPinIcon },
+                      ].map((stat, idx) => (
+                        <motion.div
+                          key={stat.label}
+                          onMouseEnter={() => setHoveredStatIdx(idx)}
+                          onMouseLeave={() => setHoveredStatIdx(null)}
+                          animate={{ scale: hoveredStatIdx === idx ? 1.07 : 1, backgroundColor: hoveredStatIdx === idx ? 'rgba(99, 102, 241, 0.4)' : 'rgba(0,0,0,0)' }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                          className="relative rounded-lg p-3 text-center bg-gradient-to-br from-primary-500/30 to-primary-800/40 shadow border border-primary-700/30 transition-all duration-200 flex flex-col items-center backdrop-blur-sm overflow-visible min-h-[120px]"
+                        >
+                          {/* Dynamic Rotating Arc */}
+                          <motion.div
+                            key={hoveredStatIdx === idx ? 'fast' : 'slow'}
+                            className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+                            animate={{
+                              rotate: 360,
+                              filter: hoveredStatIdx === idx ? 'drop-shadow(0 0 8px white)' : 'none',
+                            }}
+                            transition={{
+                              rotate: { repeat: Infinity, duration: hoveredStatIdx === idx ? 1 : 3, ease: 'linear' },
+                              filter: { duration: 0.3 },
+                            }}
+                            style={{ pointerEvents: 'none' }}
+                          >
+                            <svg width="100%" height="100%" viewBox="0 0 64 64" fill="none" className="absolute top-0 left-0 w-full h-full">
+                              <path
+                                d="M32 4
+                                  a 28 28 0 0 1 0 56
+                                  a 28 28 0 0 1 0 -56"
+                                stroke="white"
+                                strokeWidth="3"
+                                strokeDasharray="60 120"
+                                strokeLinecap="round"
+                                opacity="0.7"
+                              />
+                            </svg>
+                          </motion.div>
+                          {/* Icon with dynamic hover */}
+                          <motion.span
+                            className="relative z-10 mb-1 flex items-center justify-center"
+                            animate={{ scale: hoveredStatIdx === idx ? 1.18 : 1, rotate: hoveredStatIdx === idx ? [0, 10, -10, 0] : 0 }}
+                            transition={{ duration: 0.5, type: 'tween', ease: 'easeInOut' }}
+                          >
+                            <stat.icon className="h-6 w-6 text-primary-100" />
+                          </motion.span>
+                          <div className="text-primary-100 text-xs font-semibold tracking-wide mb-1 relative z-10">{stat.label}</div>
+                          <div className="text-xl font-extrabold text-white drop-shadow-sm relative z-10">{stat.value}</div>
+                        </motion.div>
+                      ))}
                     </div>
                   </div>
                   {/* Ticket Listings */}
