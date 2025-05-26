@@ -1,8 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect, useMemo } from 'react'
-import { MagnifyingGlassIcon, XMarkIcon, TicketIcon, BanknotesIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, BuildingLibraryIcon, MapPinIcon } from '@heroicons/react/24/outline'
+import { MagnifyingGlassIcon, XMarkIcon, TicketIcon, BanknotesIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, BuildingLibraryIcon, MapPinIcon, MusicalNoteIcon, TrophyIcon, UserGroupIcon, FaceSmileIcon } from '@heroicons/react/24/outline'
 import { motion, useScroll, useTransform, useInView, AnimatePresence, Transition } from 'framer-motion'
+import { useRouter } from 'next/navigation'
+import { CalendarIcon, HeartIcon } from '@heroicons/react/24/outline'
+import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
+import ViewTicketsModal from './ViewTicketsModal'
 
 const HeroSection = () => {
   const [searchFocused, setSearchFocused] = useState(false)
@@ -13,12 +17,18 @@ const HeroSection = () => {
   const [selectedSeat, setSelectedSeat] = useState<string | null>(null)
   const [hoveredStatIdx, setHoveredStatIdx] = useState<number | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [favorites, setFavorites] = useState<number[]>([])
+  const [hoveredEvent, setHoveredEvent] = useState<number | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [isViewTicketsModalOpen, setIsViewTicketsModalOpen] = useState(false)
   
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end start"]
   })
+
+  const router = useRouter()
 
   // Remove y, scale, and rotate transforms from background
   // const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]) // REMOVE
@@ -103,8 +113,8 @@ const HeroSection = () => {
 
   const lowerSections = Array.from({ length: NUM_LOWER_SECTIONS }, (_, i) => {
     const angle = (2 * Math.PI * i) / NUM_LOWER_SECTIONS - Math.PI / 2;
-    const x = CENTER_X + LOWER_RADIUS * Math.cos(angle) - 28;
-    const y = CENTER_Y + LOWER_RADIUS * Math.sin(angle) - 18;
+    const x = CENTER_X + LOWER_RADIUS * Math.sin(angle) - 28;
+    const y = CENTER_Y + LOWER_RADIUS * Math.cos(angle) - 18;
     return {
       id: `SU${i + 1}`,
       label: `SU${i + 1}`,
@@ -147,10 +157,10 @@ const HeroSection = () => {
   }, [])
 
   const categories = [
-    { name: 'Concerts', icon: '🎵' },
-    { name: 'Sports', icon: '⚽' },
-    { name: 'Theater', icon: '🎭' },
-    { name: 'Comedy', icon: '🎪' },
+    { name: 'Concerts', icon: MusicalNoteIcon },
+    { name: 'Sports', icon: TrophyIcon },
+    { name: 'Theater', icon: UserGroupIcon },
+    { name: 'Comedy', icon: FaceSmileIcon },
   ]
 
   // Memoize particle positions
@@ -193,6 +203,13 @@ const HeroSection = () => {
     { id: 5, section: 'Balcony', row: '3', price: '$65', quantity: 1 },
     { id: 6, section: 'VIP Box', row: '-', price: '$450', quantity: 6 },
   ]
+
+  const handleCategoryClick = (category: string) => {
+    router.push({
+      pathname: '/category/[category]',
+      query: { category: category.toLowerCase() }
+    })
+  }
 
   return (
     <motion.div 
@@ -451,7 +468,7 @@ const HeroSection = () => {
                   {/* Event Stats */}
                   <div className="mb-8">
                     <h3 className="text-2xl font-semibold text-white mb-4">
-                      {trendingEvents[currentEventIndex].title} Ticket Stats
+                      {trendingEvents[currentEventIndex].title} Tickets
                     </h3>
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                       {[
@@ -542,7 +559,7 @@ const HeroSection = () => {
           )}
         </AnimatePresence>
 
-        {/* Enhanced Categories */}
+        {/* Popular Categories */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -566,7 +583,7 @@ const HeroSection = () => {
                 className="relative group"
               >
                 <motion.button
-                  onClick={() => setSelectedCategory(category.name)}
+                  onClick={() => handleCategoryClick(category.name)}
                   className={`w-full p-4 rounded-lg transition-all duration-300 backdrop-blur-sm ${
                     selectedCategory === category.name
                       ? 'bg-gradient-primary text-white'
@@ -582,7 +599,7 @@ const HeroSection = () => {
                       }}
                       transition={{ duration: 0.5 }}
                     >
-                      {category.icon}
+                      <category.icon className="h-8 w-8" />
                     </motion.span>
                     <span className="font-medium">{category.name}</span>
                   </div>

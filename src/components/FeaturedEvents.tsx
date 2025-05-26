@@ -67,6 +67,87 @@ const events: Event[] = [
     price: 'From $199',
     description: 'Theater',
   },
+  {
+    id: 4,
+    title: "Drake - It's All A Blur Tour",
+    date: 'July 1, 2024',
+    venue: 'Staples Center',
+    image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $249',
+    description: 'Concerts',
+  },
+  {
+    id: 5,
+    title: 'Wimbledon Finals',
+    date: 'July 14, 2024',
+    venue: 'All England Club',
+    image: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $399',
+    description: 'Sports',
+  },
+  {
+    id: 6,
+    title: 'The Lion King',
+    date: 'July 20, 2024',
+    venue: 'Minskoff Theatre',
+    image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $159',
+    description: 'Theater',
+  },
+  {
+    id: 7,
+    title: 'Beyoncé - Renaissance Tour',
+    date: 'August 5, 2024',
+    venue: 'MetLife Stadium',
+    image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $279',
+    description: 'Concerts',
+  },
+  {
+    id: 8,
+    title: 'US Open Finals',
+    date: 'September 10, 2024',
+    venue: 'Arthur Ashe Stadium',
+    image: 'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $349',
+    description: 'Sports',
+  },
+  {
+    id: 9,
+    title: 'Wicked',
+    date: 'September 15, 2024',
+    venue: 'Gershwin Theatre',
+    image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $189',
+    description: 'Theater',
+  },
+  {
+    id: 10,
+    title: 'Ed Sheeran - Mathematics Tour',
+    date: 'October 1, 2024',
+    venue: 'Mercedes-Benz Stadium',
+    image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $229',
+    description: 'Concerts',
+  },
+  {
+    id: 11,
+    title: 'World Series Game 7',
+    date: 'October 30, 2024',
+    venue: 'Yankee Stadium',
+    image: 'https://images.unsplash.com/photo-1577471488278-16eec37ffcc2?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $599',
+    description: 'Sports',
+  },
+  {
+    id: 12,
+    title: 'The Phantom of the Opera',
+    date: 'November 5, 2024',
+    venue: 'Majestic Theatre',
+    image: 'https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=1200&q=80',
+    price: 'From $169',
+    description: 'Theater',
+  },
 ]
 
 const ppvEvents: PPVEvent[] = [
@@ -143,6 +224,25 @@ const FeaturedEvents = () => {
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false)
   const [isViewTicketsModalOpen, setIsViewTicketsModalOpen] = useState(false)
   const [isPPVPurchase, setIsPPVPurchase] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
+
+  const eventsPerPage = 10
+  const totalPages = Math.ceil(events.length / eventsPerPage)
+  const currentEvents = events.slice(
+    currentPage * eventsPerPage,
+    (currentPage + 1) * eventsPerPage
+  )
+
+  const firstRow = currentEvents.slice(0, 5)
+  const secondRow = currentEvents.slice(5, 10)
+
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages)
+  }
+
+  const prevPage = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages)
+  }
 
   const toggleFavorite = (eventId: number) => {
     setFavorites(prev =>
@@ -183,79 +283,187 @@ const FeaturedEvents = () => {
           className="text-center mb-12"
         >
           <h2 className="font-display text-3xl font-bold text-gray-900">Featured Events</h2>
-          <p className="mt-4 text-lg text-gray-600">Don't miss out on these upcoming events</p>
+          <p className="mt-4 text-lg text-gray-600">Discover the hottest events in your area</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
-            <motion.div
-              key={event.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: event.id * 0.1 }}
-              whileHover={{ y: -5 }}
-              onHoverStart={() => setHoveredEvent(event.id)}
-              onHoverEnd={() => setHoveredEvent(null)}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
-            >
-              <div className="relative h-48 group">
-                <img
-                  src={event.image}
-                  alt={event.title}
-                  className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => toggleFavorite(event.id)}
-                  className="absolute top-4 right-4 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-gray-200/80 transition-colors duration-200 shadow"
-                >
-                  {favorites.includes(event.id) ? (
-                    <HeartIconSolid className="h-5 w-5 text-accent-500" />
-                  ) : (
-                    <HeartIcon className="h-5 w-5 text-gray-700" />
-                  )}
-                </motion.button>
-                <AnimatePresence>
-                  {hoveredEvent === event.id && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-white/90 to-transparent"
-                    >
-                      <span className="text-sm font-medium text-primary-500">{event.description}</span>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-              <div className="p-6">
-                <h3 className="font-display text-xl font-semibold text-gray-900 mb-2">{event.title}</h3>
-                <div className="space-y-2 text-gray-700">
-                  <div className="flex items-center">
-                    <CalendarIcon className="h-5 w-5 mr-2 text-primary-500" />
-                    <span>{event.date}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <MapPinIcon className="h-5 w-5 mr-2 text-primary-500" />
-                    <span>{event.venue}</span>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-primary-600 font-semibold">{event.price}</span>
+        <div className="relative">
+          {/* First Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+            {firstRow.map((event) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: event.id * 0.1 }}
+                whileHover={{ y: -5 }}
+                onHoverStart={() => setHoveredEvent(event.id)}
+                onHoverEnd={() => setHoveredEvent(null)}
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+              >
+                <div className="relative h-32 group">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
                   <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 shadow"
-                    onClick={() => handleViewTickets(event)}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => toggleFavorite(event.id)}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-gray-200/80 transition-colors duration-200 shadow"
                   >
-                    View Tickets
+                    {favorites.includes(event.id) ? (
+                      <HeartIconSolid className="h-4 w-4 text-accent-500" />
+                    ) : (
+                      <HeartIcon className="h-4 w-4 text-gray-700" />
+                    )}
                   </motion.button>
+                  <AnimatePresence>
+                    {hoveredEvent === event.id && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-white/90 to-transparent"
+                      >
+                        <span className="text-xs font-medium text-primary-500">{event.description}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+                <div className="p-3 flex flex-col h-[140px]">
+                  <h3 className="font-display text-sm font-semibold text-gray-900 mb-1 line-clamp-2">{event.title}</h3>
+                  <div className="space-y-1 text-gray-700 text-xs">
+                    <div className="flex items-center">
+                      <CalendarIcon className="h-3 w-3 mr-1 text-primary-500 flex-shrink-0" />
+                      <span>{event.date}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPinIcon className="h-3 w-3 mr-1 text-primary-500 flex-shrink-0" />
+                      <span className="line-clamp-1">{event.venue}</span>
+                    </div>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className="text-primary-600 text-sm font-semibold whitespace-nowrap">{event.price}</span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-1.5 py-0.5 rounded-lg text-[10px] font-medium transition-all duration-300 shadow ml-2"
+                      onClick={() => handleViewTickets(event)}
+                    >
+                      View Tickets
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Second Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {secondRow.map((event) => (
+              <motion.div
+                key={event.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: event.id * 0.1 }}
+                whileHover={{ y: -5 }}
+                onHoverStart={() => setHoveredEvent(event.id)}
+                onHoverEnd={() => setHoveredEvent(null)}
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+              >
+                <div className="relative h-32 group">
+                  <img
+                    src={event.image}
+                    alt={event.title}
+                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/80 to-transparent" />
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => toggleFavorite(event.id)}
+                    className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-gray-200/80 transition-colors duration-200 shadow"
+                  >
+                    {favorites.includes(event.id) ? (
+                      <HeartIconSolid className="h-4 w-4 text-accent-500" />
+                    ) : (
+                      <HeartIcon className="h-4 w-4 text-gray-700" />
+                    )}
+                  </motion.button>
+                  <AnimatePresence>
+                    {hoveredEvent === event.id && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-white/90 to-transparent"
+                      >
+                        <span className="text-xs font-medium text-primary-500">{event.description}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <div className="p-3 flex flex-col h-[140px]">
+                  <h3 className="font-display text-sm font-semibold text-gray-900 mb-1 line-clamp-2">{event.title}</h3>
+                  <div className="space-y-1 text-gray-700 text-xs">
+                    <div className="flex items-center">
+                      <CalendarIcon className="h-3 w-3 mr-1 text-primary-500 flex-shrink-0" />
+                      <span>{event.date}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <MapPinIcon className="h-3 w-3 mr-1 text-primary-500 flex-shrink-0" />
+                      <span className="line-clamp-1">{event.venue}</span>
+                    </div>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between">
+                    <span className="text-primary-600 text-sm font-semibold whitespace-nowrap">{event.price}</span>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white px-1.5 py-0.5 rounded-lg text-[10px] font-medium transition-all duration-300 shadow ml-2"
+                      onClick={() => handleViewTickets(event)}
+                    >
+                      View Tickets
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Navigation Arrows */}
+          {currentPage > 0 && (
+            <button
+              onClick={prevPage}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-6 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-primary-50 transition z-10"
+              aria-label="Previous Events"
+            >
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
+          )}
+          <button
+            onClick={nextPage}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-6 bg-white border border-gray-300 rounded-full p-2 shadow hover:bg-primary-50 transition z-10"
+            aria-label="Next Events"
+          >
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+
+          {/* Page Dots */}
+          <div className="flex justify-center mt-6 gap-2">
+            {Array.from({ length: totalPages }).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentPage(idx)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  idx === currentPage ? 'bg-primary-500 w-4' : 'bg-gray-300'
+                }`}
+                aria-label={`Go to page ${idx + 1}`}
+              />
+            ))}
+          </div>
         </div>
 
         {/* PPV Buys Section - Header and Single Large Card with List */}

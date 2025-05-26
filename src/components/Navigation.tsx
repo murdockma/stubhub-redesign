@@ -5,11 +5,25 @@ import Link from 'next/link'
 import { Bars3Icon, XMarkIcon, MagnifyingGlassIcon, TicketIcon } from '@heroicons/react/24/outline'
 import { motion, AnimatePresence } from 'framer-motion'
 import SellTicketModal from './SellTicketModal'
+import { useRouter } from 'next/navigation'
 
 const Navigation = () => {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [isSellModalOpen, setIsSellModalOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false)
+  const [selectedLanguage, setSelectedLanguage] = useState('English')
+  const [isCurrencyMenuOpen, setIsCurrencyMenuOpen] = useState(false)
+  const [selectedCurrency, setSelectedCurrency] = useState('USD')
+  const [isHelpMenuOpen, setIsHelpMenuOpen] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,6 +32,11 @@ const Navigation = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const handleCategoryClick = (category: string) => {
+    router.push(`/category/${category.toLowerCase()}`)
+    setIsMobileMenuOpen(false)
+  }
 
   return (
     <>
@@ -40,15 +59,15 @@ const Navigation = () => {
             <div className="hidden md:block">
               <div className="ml-10 flex items-center space-x-4">
                 {['Events', 'Sports', 'Concerts', 'Theater'].map((item) => (
-                  <Link
+                  <button
                     key={item}
-                    href={`/${item.toLowerCase()}`}
+                    onClick={() => handleCategoryClick(item)}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
                       scrolled ? 'text-gray-700 hover:text-primary-600 hover:bg-gray-100' : 'text-gray-300 hover:text-white hover:bg-dark-300/50'
                     }`}
                   >
                     {item}
-                  </Link>
+                  </button>
                 ))}
               </div>
             </div>
@@ -82,10 +101,10 @@ const Navigation = () => {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-gray-400 hover:text-white focus:outline-none"
               >
-                {isOpen ? (
+                {isMobileMenuOpen ? (
                   <XMarkIcon className="h-6 w-6" />
                 ) : (
                   <Bars3Icon className="h-6 w-6" />
@@ -97,7 +116,7 @@ const Navigation = () => {
 
         {/* Mobile Navigation */}
         <AnimatePresence>
-          {isOpen && (
+          {isMobileMenuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
@@ -106,13 +125,13 @@ const Navigation = () => {
             >
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 {['Events', 'Sports', 'Concerts', 'Theater'].map((item) => (
-                  <Link
+                  <button
                     key={item}
-                    href={`/${item.toLowerCase()}`}
-                    className="text-gray-300 hover:text-white block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-dark-300/50"
+                    onClick={() => handleCategoryClick(item)}
+                    className="text-gray-300 hover:text-white block w-full text-left px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 hover:bg-dark-300/50"
                   >
                     {item}
-                  </Link>
+                  </button>
                 ))}
                 <div className="pt-4 pb-3 border-t border-dark-300">
                   <motion.button
@@ -127,7 +146,7 @@ const Navigation = () => {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       setIsSellModalOpen(true)
-                      setIsOpen(false)
+                      setIsMobileMenuOpen(false)
                     }}
                     className="w-full bg-gradient-primary text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 hover:shadow-lg hover:shadow-primary-500/20"
                   >
